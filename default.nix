@@ -69,6 +69,7 @@ pkgs.stdenv.mkDerivation rec {
     [ icestorm
       arachne-pnr
       yosys
+      dfu-util
       ghcEnv
     ];
   # LANG = "en_US.UTF-8";
