@@ -9,8 +9,10 @@
 
 # Strip out the irrelevant parts of the source
 let src = with pkgs.lib;
-          let p = n: (toString ./dist) == n;
-          in cleanSourceWith {filter = (n: t: !p n); src = cleanSource ./.;};
+          cleanSourceWith {
+            filter = n: t: n != "build" && t != "unknown";
+            src = cleanSource ./.;
+          };
 
     clash-compiler = pkgs.fetchFromGitHub{
       owner  = "clash-lang";
