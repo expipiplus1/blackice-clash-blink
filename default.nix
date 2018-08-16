@@ -1,4 +1,11 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ rev     ? "c29d2fde74d03178ed42655de6dee389f2b7d37f"
+, nixpkgs ?
+    import (builtins.fetchTarball {
+      url = "https://github.com/NixOS/nixpkgs/archive/${rev}.tar.gz";
+       }) {
+    }
+, pkgs ? nixpkgs.pkgs
+}:
 
 # Strip out the irrelevant parts of the source
 let src = with pkgs.lib;
@@ -50,7 +57,29 @@ let src = with pkgs.lib;
           sha256 = "19cw12v33c0wkd7bv4mjl7pgyswf52lkjk6mz82j4z31v0v2w60w";
         }) {};
 
-        prettyprinter = self.callHackage "prettyprinter" "1.2.1" {};
+        "prettyprinter" = self.callPackage
+          ({ mkDerivation, ansi-wl-pprint, base, bytestring, containers
+           , criterion, deepseq, doctest, mtl, pgp-wordlist, QuickCheck
+           , random, tasty, tasty-hunit, tasty-quickcheck, text, transformers
+           }:
+           mkDerivation {
+             pname = "prettyprinter";
+             version = "1.2.1";
+             sha256 = "1kvza7jp5n833m8rj0bc35bd2p8wx3fq0iqflm9nbh3wm05kwrg7";
+             isLibrary = true;
+             isExecutable = true;
+             libraryHaskellDepends = [ base text ];
+             testHaskellDepends = [
+               base bytestring doctest pgp-wordlist tasty tasty-hunit
+               tasty-quickcheck text
+             ];
+             benchmarkHaskellDepends = [
+               ansi-wl-pprint base containers criterion deepseq mtl QuickCheck
+               random text transformers
+             ];
+             description = "A modern, easy to use, well-documented, extensible pretty-printer";
+             license = stdenv.lib.licenses.bsd2;
+           }) {};
       };
     };
 
