@@ -83,8 +83,11 @@ let src = with pkgs.lib;
       };
     };
 
-  haskellBuildInputs = hp: with hp; [ clash-ghc ];
-  ghcEnv = haskellPackages.ghcWithPackages haskellBuildInputs;
+  haskellBuildInputs = hp: with hp;
+    [ clash-ghc
+      shake
+    ];
+  ghcEnv = haskellPackages.ghcWithHoogle haskellBuildInputs;
   ghcCommand = "ghc";
   ghcCommandCaps = pkgs.lib.toUpper ghcCommand;
   ghc = haskellPackages.ghc;
@@ -101,8 +104,15 @@ pkgs.stdenv.mkDerivation rec {
       dfu-util
       ghcEnv
     ];
-  # LANG = "en_US.UTF-8";
-  # LOCALE_ARCHIVE = lib.optionalString stdenv.isLinux "${glibcLocales}/lib/locale/locale-archive";
+  preBuild = shellHook;
+  buildPhase = ''
+    ./Make.hs -j$NIX_BUILD_CORES
+  '';
+  installPhase = ''
+    mkdir -p "$out"
+    cp build/chip.bin "$out"
+  '';
+  LANG = "en_US.UTF-8";
   shellHook = ''
     export NIX_${ghcCommandCaps}="${ghcEnv}/bin/${ghcCommand}"
     export NIX_${ghcCommandCaps}PKG="${ghcEnv}/bin/ghc-pkg"
