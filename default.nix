@@ -10,7 +10,10 @@
 # Strip out the irrelevant parts of the source
 let src = with pkgs.lib;
           cleanSourceWith {
-            filter = n: t: n != "build" && t != "unknown";
+            filter = n: t:
+              n != "build" &&
+              n != "result" &&
+              t != "unknown";
             src = cleanSource ./.;
           };
 
