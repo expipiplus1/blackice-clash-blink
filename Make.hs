@@ -47,7 +47,8 @@ gatherVerilog = do
   haskellSources       <- getDirectoryFiles "" [src <> "//*.hs"]
   let haskellBaseNames = takeBaseName <$> haskellSources
       listingFiles     = [ build </> bn <.> "listing" | bn <- haskellBaseNames ]
-  haskellHDLFiles <- fmap read <$> forP listingFiles readFile'
+  need listingFiles
+  haskellHDLFiles <- fmap read <$> traverse readFile' listingFiles
   pure $ nativeVerilogSources <> concat haskellHDLFiles
 
 icestormRules :: Rules ()
